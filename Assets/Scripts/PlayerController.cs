@@ -5,20 +5,23 @@ public class PlayerController : MonoBehaviour
 {
    
     // Speed of Player
-    public float playerSpeed=10;
+    public float playerSpeed;
 
 
     private Rigidbody playerRB;
     private InputSystem_Actions controls;
     private Vector2 moveInput;
     private Vector2 turnInput;
-    public float mouseSens = 0.3f;
+    public float mouseSens;
 
-    public float jumpForce = 500;
-    public float jumpTiming = 1f;
+    public float jumpForce;
+    public float jumpTiming;
     private bool isGround = true;
 
     private Animator playerAnim;
+
+    public GameObject bulletSpawn;
+    public GameObject bullet;
 
 
     void Awake()
@@ -80,6 +83,7 @@ public class PlayerController : MonoBehaviour
         if (controls.Player.Attack.triggered)
         {
             Debug.Log("Shoot!");
+            Instantiate(bullet, bulletSpawn.transform.position, bulletSpawn.transform.rotation);
         }
     }
 
