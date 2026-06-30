@@ -15,6 +15,7 @@ public class PlayerController : MonoBehaviour
     public float mouseSens = 0.3f;
 
     public float jumpForce = 500;
+    public float jumpTiming = 1f;
     private bool isGround = true;
 
     private Animator playerAnim;
@@ -57,7 +58,7 @@ public class PlayerController : MonoBehaviour
             
             isGround = false;
             playerAnim.SetTrigger("jumpTrig");
-            //playerRB.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            Invoke("Jump", jumpTiming);
         }
 
         if (controls.Player.Crouch.IsPressed())
@@ -75,6 +76,11 @@ public class PlayerController : MonoBehaviour
             //Debug.Log("Unsprint");      
             playerAnim.SetBool("sprintHold", false);    
         }
+
+        if (controls.Player.Attack.triggered)
+        {
+            Debug.Log("Shoot!");
+        }
     }
 
     void FixedUpdate()
@@ -87,6 +93,11 @@ public class PlayerController : MonoBehaviour
         playerRB.linearVelocity = new Vector3(move.x * playerSpeed, playerRB.linearVelocity.y,move.z * playerSpeed);
         
         
+    }
+
+    void Jump()
+    {
+        playerRB.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
     }
 
     void OnCollisionEnter(Collision collision)
