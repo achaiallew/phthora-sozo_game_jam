@@ -6040,7 +6040,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   playerSpeed: 8
-  mouseSens: 0.1
+  mouseSens: 0.4
   jumpForce: 350
   jumpTiming: 0.18
   bulletSpawn: {fileID: 976783985}
