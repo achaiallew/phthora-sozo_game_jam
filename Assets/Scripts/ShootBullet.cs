@@ -13,4 +13,9 @@ public class ShootBullet : MonoBehaviour
         Vector3 direction = transform.rotation * Quaternion.Euler(forwardCorrection) * Vector3.forward;
         bulletRB.linearVelocity = direction * bulletSpeed;
     }
+
+    private void OnCollisionEnter(Collision other) {
+        Destroy(gameObject);
+        Destroy(other.gameObject);
+    }
 }
