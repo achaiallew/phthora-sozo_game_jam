@@ -398,7 +398,7 @@ MonoBehaviour:
   - {fileID: 1492917983}
   - {fileID: 1632403082}
   - {fileID: 278675116}
-  - {fileID: 1381703901}
+  - {fileID: 0}
   enemyType1: {fileID: 8630480519071593157, guid: 939da0b1d3351f843a2704c183d77951, type: 3}
 --- !u!1 &213224165
 GameObject:
@@ -1277,7 +1277,7 @@ Transform:
   m_GameObject: {fileID: 1381703900}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 2.1900005, y: 0, z: 28.089998}
+  m_LocalPosition: {x: 2.0555, y: 0.1068, z: 28.3843}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

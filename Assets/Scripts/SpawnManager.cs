@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class SpawnManager : MonoBehaviour
 {
@@ -10,7 +11,7 @@ public class SpawnManager : MonoBehaviour
     void Awake()
     {
         // Instantiate an enemy at each spawn transform's position and rotation
-        enemySpawns.ForEach(spawn => Instantiate(enemyType1, spawn.position, spawn.rotation));
+        //enemySpawns.ForEach(spawn => Instantiate(enemyType1, spawn.position, spawn.rotation));
         // for (int i = 0; i < enemySpawns.Count; i++)
         // {
         //     Instantiate(enemyType1, enemySpawns[i].position, enemySpawns[i].rotation);
@@ -18,17 +19,17 @@ public class SpawnManager : MonoBehaviour
 
 
 
-        // foreach (Transform spawn in enemySpawns)
-        // {
-        //     if (NavMesh.SamplePosition(spawn.position, out NavMeshHit hit, 5f, NavMesh.AllAreas))
-        //     {
-        //         Instantiate(enemyType1, hit.position, spawn.rotation);
-        //     }
-        //     else
-        //     {
-        //         Debug.LogWarning($"Spawn point {spawn.name} is too far from the NavMesh — check its position.");
-        //     }
-        // }
+        foreach (Transform spawn in enemySpawns)
+        {
+            if (NavMesh.SamplePosition(spawn.position, out NavMeshHit hit, 5f, NavMesh.AllAreas))
+            {
+                Instantiate(enemyType1, spawn.position, spawn.rotation);
+            }
+            else
+            {
+                Debug.LogWarning($"Spawn point {spawn.name} is too far from the NavMesh — check its position.");
+            }
+        }
     }
         
 

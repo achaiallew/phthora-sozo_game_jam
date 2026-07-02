@@ -2622,10 +2622,10 @@ GameObject:
   m_Component:
   - component: {fileID: 8089857978668105785}
   - component: {fileID: 7476626413327429883}
-  - component: {fileID: 8875421294660849008}
   - component: {fileID: 5297755272913658233}
   - component: {fileID: 4130883559712000993}
   - component: {fileID: 5042879959071805547}
+  - component: {fileID: 4688228029423169326}
   m_Layer: 0
   m_Name: Enemy_Blue
   m_TagString: Enemy
@@ -2642,7 +2642,7 @@ Transform:
   m_GameObject: {fileID: 8630480519071593157}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -12.598, y: 0.01, z: 3.21}
+  m_LocalPosition: {x: -12.676, y: 0.01, z: 3.21}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2673,33 +2673,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!54 &8875421294660849008
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8630480519071593157}
-  serializedVersion: 5
-  m_Mass: 75
-  m_LinearDamping: 0
-  m_AngularDamping: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
 --- !u!136 &5297755272913658233
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -2717,12 +2690,12 @@ CapsuleCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Radius: 0.26464128
   m_Height: 1.8177524
   m_Direction: 1
-  m_Center: {x: -0.020427227, y: 0.8018899, z: 0.02369976}
+  m_Center: {x: -0.65, y: 1.35, z: 0.1}
 --- !u!114 &4130883559712000993
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2758,6 +2731,31 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!143 &4688228029423169326
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8630480519071593157}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Height: 2
+  m_Radius: 0.5
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: -0.4, y: 1.35, z: 0.25}
 --- !u!1 &8665282712266984995
 GameObject:
   m_ObjectHideFlags: 0
