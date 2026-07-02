@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3384098}
   - component: {fileID: 2355204}
   - component: {fileID: 6507386}
+  - component: {fileID: 4996918785119557382}
   m_Layer: 0
   m_Name: Door_Left_01
   m_TagString: Untagged
@@ -113,6 +114,28 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 2.7500012, y: 0.55976033, z: 3.4999988}
   m_Center: {x: -1.6250011, y: -0.5217551, z: 1.7499998}
+--- !u!95 &4996918785119557382
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 169994}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 17565025fe61d1b4e87d92698b65e314, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &192030
 GameObject:
   m_ObjectHideFlags: 0

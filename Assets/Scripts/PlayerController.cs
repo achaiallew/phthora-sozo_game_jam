@@ -47,6 +47,8 @@ public class PlayerController : MonoBehaviour
         turnInput = controls.Player.Look.ReadValue<Vector2>();
 
         transform.Rotate(turnInput.x * transform.up*mouseSens);
+
+        
         
         if (controls.Player.Move.IsInProgress())
         {

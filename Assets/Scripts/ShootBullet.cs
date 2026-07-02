@@ -15,7 +15,11 @@ public class ShootBullet : MonoBehaviour
     }
 
     private void OnCollisionEnter(Collision other) {
-        Destroy(gameObject);
-        Destroy(other.gameObject);
+
+        if (other.gameObject.CompareTag("Enemy"))
+        {
+            Destroy(other.gameObject); // Take Damage (Enemy Health)
+        }
+        Destroy(gameObject); 
     }
 }
