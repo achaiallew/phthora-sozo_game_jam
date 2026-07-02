@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class DoorController : MonoBehaviour
 {
-    private Vector3 playerPos;
+    private GameObject player;
 
     private Animator animator;
 
@@ -13,27 +13,27 @@ public class DoorController : MonoBehaviour
     {
         animator = GetComponent<Animator>();
         animator.SetBool("openDoor", false);
-        playerPos = GameObject.FindGameObjectWithTag("Player").transform.position;
+        player = GameObject.FindGameObjectWithTag("Player");
     }
 
     void Update()
     {
         //TODO: Animate Open Door, when player if in Vicinity
-        // float xPos = (playerPos - gameObject.transform.position).Abs().x ;
-        // float zPos= (playerPos- gameObject.transform.position).Abs().z;
+        float xPos = (player.transform.position - gameObject.transform.position).Abs().x ;
+        float zPos= (player.transform.position- gameObject.transform.position).Abs().z;
        
-        // if ((xPos < doorDist) || (zPos < doorDist))
-        // {
-        //     Debug.Log("TriggerDoorAnim");
-        //     animator.SetBool("openDoor", true);
-        // }
+        if ((xPos < doorDist) || (zPos < doorDist))
+        {
+            Debug.Log("TriggerDoorAnim");
+            animator.SetBool("openDoor", true);
+        }
 
-        // if (animator.GetBool("openDoor"))
-        // {
-        //     if ((xPos > doorDist) || (zPos > doorDist))
-        //     {
-        //         animator.SetBool("openDoor", false);
-        //     }
-        // }    
+        if (animator.GetBool("openDoor"))
+        {
+            if ((xPos > doorDist) || (zPos > doorDist))
+            {
+                animator.SetBool("openDoor", false);
+            }
+        }    
     }
 }

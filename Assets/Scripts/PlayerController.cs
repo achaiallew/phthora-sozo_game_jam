@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour
     private InputAction jumpAction;
     private InputAction shootAction;
     private InputAction sprintAction;
+    private InputAction kneelAction;
 
 
     [SerializeField]
@@ -47,11 +48,13 @@ public class PlayerController : MonoBehaviour
         // Allocate Player Rigidbody
         playerRB = GetComponent<Rigidbody>();
         playerAnim = GetComponent<Animator>();
+        controller = GetComponent<CharacterController>();
 
         moveAction = InputSystem.actions.FindAction("Move");
         jumpAction = InputSystem.actions.FindAction("Jump");
         shootAction = InputSystem.actions.FindAction("Attack");
         sprintAction = InputSystem.actions.FindAction("Sprint");
+        kneelAction = InputSystem.actions.FindAction("Crouch");
     
     }
 
@@ -72,30 +75,9 @@ public class PlayerController : MonoBehaviour
 
         Move();
         Jump();
+        Kneel();
+        Shoot();
         
-        //TODO: Crouching
-    
-        // if (controls.Player.Crouch.IsPressed())
-        // {
-        //     Debug.Log("Crouch");             
-        // } else if (controls.Player.Crouch.WasReleasedThisFrame()){
-        //     Debug.Log("Uncrouch");         
-        // }
-
-        if (sprintAction.WasPerformedThisFrame())
-        {
-            //Debug.Log("Sprint");  
-            playerAnim.SetBool("sprintHold", true);           
-        } else if (sprintAction.WasReleasedThisFrame()){ 
-            //Debug.Log("Unsprint");      
-            playerAnim.SetBool("sprintHold", false);    
-        }
-
-        if (shootAction.triggered)
-        {
-            Debug.Log("Shoot!");
-            Instantiate(bullet, bulletSpawn.transform.position, bulletSpawn.transform.rotation);
-        }
     }
 
     
@@ -124,6 +106,9 @@ public class PlayerController : MonoBehaviour
         {
             playerAnim.SetBool("walkHold", false);
         }
+
+        // Sprint When Walking Only
+        Sprint();
     }
     void Jump()
     {
@@ -134,7 +119,7 @@ public class PlayerController : MonoBehaviour
             if (jumpAction.triggered)
             {   
                 //TODO: Fix Jump Anim
-                //playerAnim.SetTrigger("jumpTrig");
+                playerAnim.SetTrigger("jumpTrig");
                 verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);   
             }
         }
@@ -145,21 +130,39 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    void Sprint()
+    {
+        if (sprintAction.WasPerformedThisFrame())
+        {
+            //Debug.Log("Sprint");  
+            playerAnim.SetBool("sprintHold", true); 
+            playerSpeed *= 2f;          
+        } else if (sprintAction.WasReleasedThisFrame()){ 
+            //Debug.Log("Unsprint");      
+            playerAnim.SetBool("sprintHold", false); 
+            playerSpeed /= 2f;    
+        }
+    }
+    
+    void Kneel()
+    {
+        if (kneelAction.WasPerformedThisFrame())
+        {
+            Debug.Log("Crouch"); 
+            playerAnim.SetBool("kneelHold", true);            
+        } else if (kneelAction.WasReleasedThisFrame()){
+            Debug.Log("Uncrouch");      
+            playerAnim.SetBool("kneelHold", false);    
+        }
+    }
 
+    void Shoot()
+    {
+        if (shootAction.triggered)
+        {
+            Debug.Log("Shoot!");
+            Instantiate(bullet, bulletSpawn.transform.position, bulletSpawn.transform.rotation);
+        }
+    }
 
-    // private CharacterController controller;
-
-    // void Start()
-    // {
-    //     controller = GetComponent<CharacterController>();
-    // }
-
-    // void Update()
-    // {
-    //     moveInput = controls.Player.Move.ReadValue<Vector2>();
-    //     Vector3 move = transform.right * moveInput.x +
-    //                     transform.forward * moveInput.y;
-
-    //     controller.Move(move * playerSpeed * Time.deltaTime);
-    // } 
 }
