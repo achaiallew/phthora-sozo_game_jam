@@ -120,7 +120,7 @@ public class PlayerController : MonoBehaviour
             {   
                 //TODO: Fix Jump Anim
                 playerAnim.SetTrigger("jumpTrig");
-                verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);   
+                Invoke("JumpVert", 0.2f);   
             }
         }
         else
@@ -163,6 +163,11 @@ public class PlayerController : MonoBehaviour
             Debug.Log("Shoot!");
             Instantiate(bullet, bulletSpawn.transform.position, bulletSpawn.transform.rotation);
         }
+    }
+
+    void JumpVert()
+    {
+        verticalVelocity = Mathf.Sqrt(jumpHeight * -1f * gravity);
     }
 
 }
