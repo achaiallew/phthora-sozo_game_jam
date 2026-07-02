@@ -1,22 +1,40 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 
 public class PlayerController : MonoBehaviour
 {
-   
+    //TODO: Add Comments to Code
     // Speed of Player
-    public float playerSpeed;
+    public InputActionAsset InputActions;
+    public CharacterController controller;
+
+    private InputAction moveAction;
+    private InputAction jumpAction;
+    private InputAction shootAction;
+    private InputAction sprintAction;
+
+
+    [SerializeField]
+    private Transform playerCamera;
+
+    public float playerSpeed = 8.0f;
+
+
+    private float verticalVelocity = 0f;
+    public float jumpHeight = 1.0f;
+    private float gravity = -9.8f;
 
 
     private Rigidbody playerRB;
-    private InputSystem_Actions controls;
     private Vector2 moveInput;
-    private Vector2 turnInput;
+
     public float mouseSens;
 
     public float jumpForce;
     public float jumpTiming;
-    private bool isGround = true;
+    
+
 
     private Animator playerAnim;
 
@@ -28,88 +46,105 @@ public class PlayerController : MonoBehaviour
     {
         // Allocate Player Rigidbody
         playerRB = GetComponent<Rigidbody>();
-
-        controls = new InputSystem_Actions();
-
         playerAnim = GetComponent<Animator>();
 
+        moveAction = InputSystem.actions.FindAction("Move");
+        jumpAction = InputSystem.actions.FindAction("Jump");
+        shootAction = InputSystem.actions.FindAction("Attack");
+        sprintAction = InputSystem.actions.FindAction("Sprint");
+    
     }
 
     void OnEnable()
     {
-        controls.Enable();
+        InputActions.FindActionMap("Player").Enable();
+    }
+
+    void OnDisable()
+    {
+        InputActions.FindActionMap("Player").Disable();
     }
 
 
     void Update()
     {
-        moveInput = controls.Player.Move.ReadValue<Vector2>();
-        turnInput = controls.Player.Look.ReadValue<Vector2>();
+        moveInput = moveAction.ReadValue<Vector2>();
 
-        transform.Rotate(turnInput.x * transform.up*mouseSens);
-
+        Move();
+        Jump();
         
-        
-        if (controls.Player.Move.IsInProgress())
-        {
-            //Debug.Log("Walk");
-            playerAnim.SetBool("walkHold", true);
-        } else {    playerAnim.SetBool("walkHold", false);  }
-  
+        //TODO: Crouching
+    
+        // if (controls.Player.Crouch.IsPressed())
+        // {
+        //     Debug.Log("Crouch");             
+        // } else if (controls.Player.Crouch.WasReleasedThisFrame()){
+        //     Debug.Log("Uncrouch");         
+        // }
 
-        if (controls.Player.Jump.triggered && isGround)
-        {
-            Debug.Log("Jump");
-            
-            isGround = false;
-            playerAnim.SetTrigger("jumpTrig");
-            Invoke("Jump", jumpTiming);
-        }
-
-        if (controls.Player.Crouch.IsPressed())
-        {
-            Debug.Log("Crouch");             
-        } else if (controls.Player.Crouch.WasReleasedThisFrame()){
-            Debug.Log("Uncrouch");         
-        }
-
-        if (controls.Player.Sprint.IsPressed())
+        if (sprintAction.WasPerformedThisFrame())
         {
             //Debug.Log("Sprint");  
             playerAnim.SetBool("sprintHold", true);           
-        } else if (controls.Player.Sprint.WasReleasedThisFrame()){ 
+        } else if (sprintAction.WasReleasedThisFrame()){ 
             //Debug.Log("Unsprint");      
             playerAnim.SetBool("sprintHold", false);    
         }
 
-        if (controls.Player.Attack.triggered)
+        if (shootAction.triggered)
         {
             Debug.Log("Shoot!");
             Instantiate(bullet, bulletSpawn.transform.position, bulletSpawn.transform.rotation);
         }
     }
 
-    void FixedUpdate()
+    
+    private void Move()
     {
-        Vector3 move = transform.right * moveInput.x +
-                        transform.forward * moveInput.y;
-        
-        //transform.Translate(move * playerSpeed * Time.deltaTime);
-        //Debug.Log(moveInput);
-        playerRB.linearVelocity = new Vector3(move.x * playerSpeed, playerRB.linearVelocity.y,move.z * playerSpeed);
-        
-        
-    }
+        float cameraYaw = playerCamera.eulerAngles.y;
 
+        // Body always faces where the camera looks (shooter-style aiming)
+        transform.rotation = Quaternion.Euler(0f, cameraYaw, 0f);
+
+        Vector3 verticalMove = new Vector3(0f, verticalVelocity, 0f) * Time.deltaTime;
+
+        // WASD strafes relative to camera facing, not player facing
+        Vector3 inputDir = new Vector3(moveInput.x, 0f, moveInput.y);
+        Vector3 moveDirection = Quaternion.Euler(0f, cameraYaw, 0f) * inputDir;
+
+        controller.Move(moveDirection.normalized * playerSpeed * Time.deltaTime + verticalMove);
+
+        //TODO: Diff Anim for Diff Directions
+        // Animation
+        if (inputDir.magnitude > 0.1f)
+        {
+            playerAnim.SetBool("walkHold", true);
+        }
+        else
+        {
+            playerAnim.SetBool("walkHold", false);
+        }
+    }
     void Jump()
     {
-        playerRB.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+        if (controller.isGrounded)
+        {
+            verticalVelocity = -1f;
+
+            if (jumpAction.triggered)
+            {   
+                //TODO: Fix Jump Anim
+                //playerAnim.SetTrigger("jumpTrig");
+                verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);   
+            }
+        }
+        else
+        {
+            verticalVelocity += gravity * Time.deltaTime; 
+            verticalVelocity = Mathf.Max(verticalVelocity, -20f);
+        }
     }
 
-    void OnCollisionEnter(Collision collision)
-    {
-        isGround = true;
-    }
 
 
     // private CharacterController controller;
