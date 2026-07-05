@@ -18,13 +18,13 @@ public class DoorController : MonoBehaviour
 
     void Update()
     {
-        //TODO: Animate Open Door, when player if in Vicinity
+        //TODO: Animate Open Door, (Find Better System)
         float xPos = (player.transform.position - gameObject.transform.position).Abs().x ;
         float zPos= (player.transform.position- gameObject.transform.position).Abs().z;
        
         if ((xPos < doorDist) || (zPos < doorDist))
         {
-            Debug.Log("TriggerDoorAnim");
+            //Debug.Log("TriggerDoorAnim");
             animator.SetBool("openDoor", true);
         }
 

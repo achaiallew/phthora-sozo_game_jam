@@ -98,7 +98,7 @@ public class PlayerController : MonoBehaviour
 
         //TODO: Diff Anim for Diff Directions
         // Animation
-        if (inputDir.magnitude > 0.1f)
+        if (inputDir.magnitude > 0.01f)
         {
             playerAnim.SetBool("walkHold", true);
         }
@@ -136,11 +136,11 @@ public class PlayerController : MonoBehaviour
         {
             //Debug.Log("Sprint");  
             playerAnim.SetBool("sprintHold", true); 
-            playerSpeed *= 2f;          
+            playerSpeed *= 2.5f;          
         } else if (sprintAction.WasReleasedThisFrame()){ 
             //Debug.Log("Unsprint");      
             playerAnim.SetBool("sprintHold", false); 
-            playerSpeed /= 2f;    
+            playerSpeed /= 2.5f;    
         }
     }
     
@@ -148,10 +148,10 @@ public class PlayerController : MonoBehaviour
     {
         if (kneelAction.WasPerformedThisFrame())
         {
-            Debug.Log("Crouch"); 
+            //Debug.Log("Crouch"); 
             playerAnim.SetBool("kneelHold", true);            
         } else if (kneelAction.WasReleasedThisFrame()){
-            Debug.Log("Uncrouch");      
+            //Debug.Log("Uncrouch");      
             playerAnim.SetBool("kneelHold", false);    
         }
     }
@@ -160,7 +160,7 @@ public class PlayerController : MonoBehaviour
     {
         if (shootAction.triggered)
         {
-            Debug.Log("Shoot!");
+            //Debug.Log("Shoot!");
             Instantiate(bullet, bulletSpawn.transform.position, bulletSpawn.transform.rotation);
         }
     }
