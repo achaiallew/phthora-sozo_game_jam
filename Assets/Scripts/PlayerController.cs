@@ -27,7 +27,6 @@ public class PlayerController : MonoBehaviour
     private float gravity = -9.8f;
 
 
-    private Rigidbody playerRB;
     private Vector2 moveInput;
 
     public float mouseSens;
@@ -42,13 +41,19 @@ public class PlayerController : MonoBehaviour
     public GameObject bulletSpawn;
     public GameObject bullet;
 
+    [SerializeField] private float playerHealth = 100;
+
+    private AudioSource moveSound;
+     [SerializeField] private AudioSource runSound;
+
+
 
     void Awake()
     {
         // Allocate Player Rigidbody
-        playerRB = GetComponent<Rigidbody>();
         playerAnim = GetComponent<Animator>();
         controller = GetComponent<CharacterController>();
+        moveSound = GetComponent<AudioSource>();
 
         moveAction = InputSystem.actions.FindAction("Move");
         jumpAction = InputSystem.actions.FindAction("Jump");
@@ -77,6 +82,12 @@ public class PlayerController : MonoBehaviour
         Jump();
         Kneel();
         Shoot();
+        AudioController();
+
+        if (playerHealth < 0)
+        {
+            Debug.Log("Game Over!");
+        }
         
     }
 
@@ -95,11 +106,12 @@ public class PlayerController : MonoBehaviour
         Vector3 moveDirection = Quaternion.Euler(0f, cameraYaw, 0f) * inputDir;
 
         controller.Move(moveDirection.normalized * playerSpeed * Time.deltaTime + verticalMove);
-
+        
         //TODO: Diff Anim for Diff Directions
         // Animation
         if (inputDir.magnitude > 0.01f)
         {
+            
             playerAnim.SetBool("walkHold", true);
         }
         else
@@ -168,6 +180,38 @@ public class PlayerController : MonoBehaviour
     void JumpVert()
     {
         verticalVelocity = Mathf.Sqrt(jumpHeight * -1f * gravity);
+    }
+
+    public void TakeDamage(float dmg)
+    {
+        playerHealth -= dmg;
+        Debug.Log(playerHealth);
+    }
+
+    void AudioController()
+    {
+        if (moveAction.WasPerformedThisFrame() && !sprintAction.WasPerformedThisFrame())
+        {
+            moveSound.Play();
+        } 
+        
+        if (moveAction.IsInProgress() && sprintAction.WasPerformedThisFrame())
+        {
+            Debug.Log("Sprint Sound!");
+            runSound.Play();
+            moveSound.Pause();
+        }
+        
+        if (sprintAction.WasReleasedThisFrame())
+        {
+            runSound.Pause();
+            moveSound.Play();
+        }
+
+        if (moveAction.WasReleasedThisFrame())
+        {
+            moveSound.Pause();
+        } 
     }
 
 }

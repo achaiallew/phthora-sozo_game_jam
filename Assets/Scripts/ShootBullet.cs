@@ -4,22 +4,32 @@ public class ShootBullet : MonoBehaviour
 {
     
     public float bulletSpeed;
-    public Vector3 forwardCorrection = new Vector3(-90f, 0f, 0f); // adjust based on your mesh
     private Rigidbody bulletRB;
+    private GameObject player;
 
-    void Start()
+    private EnemyController enemyController;
+
+
+       void Start()
     {
         bulletRB = GetComponent<Rigidbody>();
-        Vector3 direction = transform.rotation * Quaternion.Euler(forwardCorrection) * Vector3.forward;
-        bulletRB.linearVelocity = direction * bulletSpeed;
+        player = GameObject.FindGameObjectWithTag("Player");
+        Vector3 direction = transform.rotation * Quaternion.Euler(player.transform.position) * Vector3.back;
+        bulletRB.AddForce(direction*bulletSpeed, ForceMode.Impulse);
     }
 
     private void OnCollisionEnter(Collision other) {
 
         if (other.gameObject.CompareTag("Enemy"))
         {
-            Destroy(other.gameObject); // Take Damage (Enemy Health)
+            enemyController = other.gameObject.GetComponent<EnemyController>();
+            float dmg = Random.Range(20f, 40f);
+            enemyController.TakeDamage(dmg);
         }
-        Destroy(gameObject); 
+        if (!other.gameObject.CompareTag("Player"))
+        {
+            Destroy(gameObject);
+        }
+         
     }
 }

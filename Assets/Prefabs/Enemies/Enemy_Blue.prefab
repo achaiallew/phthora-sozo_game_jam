@@ -2722,6 +2722,7 @@ MonoBehaviour:
   detectPlayer: 0
   bullet: {fileID: 7653624160004875867, guid: 1799f59e4d68bc84495c5390df79d030, type: 3}
   bulletSpawn: {fileID: 8879412351764407102}
+  enemyHealth: 100
 --- !u!195 &5042879959071805547
 NavMeshAgent:
   m_ObjectHideFlags: 0

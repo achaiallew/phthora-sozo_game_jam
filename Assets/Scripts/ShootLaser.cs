@@ -6,6 +6,7 @@ public class ShootLaser : MonoBehaviour
     public float laserSpeed;
     private Rigidbody laserRB;
     private GameObject player;
+    private PlayerController playerController;
 
     void Start()
     {
@@ -13,13 +14,17 @@ public class ShootLaser : MonoBehaviour
         player = GameObject.FindGameObjectWithTag("Player");
         Vector3 direction = transform.rotation * Quaternion.Euler(player.transform.position) * Vector3.forward;
         laserRB.AddForce(direction*laserSpeed, ForceMode.Impulse);
+
+        playerController = player.GetComponent<PlayerController>();
     }
 
     private void OnCollisionEnter(Collision other) {
 
         if (other.gameObject.CompareTag("Player"))
         {
-            Debug.Log("Take Damage");// Take Damage (Enemy Health)
+            float dmg = Random.Range(10f, 20f);
+            Debug.Log("Shoot Player! " + dmg);
+            playerController.TakeDamage(dmg);
         }
         if (!other.gameObject.CompareTag("Enemy"))
         {

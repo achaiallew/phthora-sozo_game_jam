@@ -23,6 +23,8 @@ public class EnemyController : MonoBehaviour
 
     private bool shootPlayer = false;
 
+    [SerializeField] private float enemyHealth = 100;
+
 
     void Awake()
     {
@@ -90,6 +92,12 @@ public class EnemyController : MonoBehaviour
             }
         }
 
+        if (enemyHealth < 0)
+        {
+            Debug.Log("Die");
+            Destroy(gameObject);
+        }
+
     }
 
     void ShootPlayer()
@@ -111,5 +119,10 @@ public class EnemyController : MonoBehaviour
         {
             detectPlayer = false;
         }
+    }
+
+    public void TakeDamage(float dmg)
+    {
+        enemyHealth -= dmg;
     }
 }
