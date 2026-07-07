@@ -8,9 +8,14 @@ public class SpawnManager : MonoBehaviour
     [SerializeField] private List<Transform> patrolRoutes = new List<Transform>(); // drag Route_A, Route_B, etc. here
     [SerializeField] private GameObject enemyType1;
 
+    private int enemyCount = 0;
+
     void Awake()
     {
-        for (int i = 0; i < enemySpawns.Count; i++)
+        enemyCount = enemySpawns.Count;
+
+
+        for (int i = 0; i < enemyCount; i++)
         {
             Transform spawn = enemySpawns[i];
 

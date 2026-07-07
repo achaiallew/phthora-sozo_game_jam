@@ -14,6 +14,7 @@ public class PlayerController : MonoBehaviour
     private InputAction shootAction;
     private InputAction sprintAction;
     private InputAction kneelAction;
+    private InputAction interactAction;
 
 
     [SerializeField]
@@ -44,22 +45,27 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float playerHealth = 100;
 
     private AudioSource moveSound;
-     [SerializeField] private AudioSource runSound;
+    [SerializeField] private AudioSource runSound;
 
+    private GameManager gameManager;
+
+    public int shotsTaken;
+    public int shotsOnTarget;
 
 
     void Awake()
     {
-        // Allocate Player Rigidbody
         playerAnim = GetComponent<Animator>();
         controller = GetComponent<CharacterController>();
         moveSound = GetComponent<AudioSource>();
+        gameManager = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
 
         moveAction = InputSystem.actions.FindAction("Move");
         jumpAction = InputSystem.actions.FindAction("Jump");
         shootAction = InputSystem.actions.FindAction("Attack");
         sprintAction = InputSystem.actions.FindAction("Sprint");
         kneelAction = InputSystem.actions.FindAction("Crouch");
+        interactAction = InputSystem.actions.FindAction("Interact");
     
     }
 
@@ -76,19 +82,22 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        moveInput = moveAction.ReadValue<Vector2>();
-
-        Move();
-        Jump();
-        Kneel();
-        Shoot();
-        AudioController();
-
-        if (playerHealth < 0)
+        if (gameManager.gameActive)
         {
-            Debug.Log("Game Over!");
-        }
-        
+            moveInput = moveAction.ReadValue<Vector2>();
+
+            Move();
+            Jump();
+            Kneel();
+            Shoot();
+            AudioController();
+
+            if (playerHealth < 0)
+            {
+                playerAnim.SetTrigger("isDead");
+                gameManager.GameOver();
+            }
+        }   
     }
 
     
@@ -112,11 +121,11 @@ public class PlayerController : MonoBehaviour
         if (inputDir.magnitude > 0.01f)
         {
             
-            playerAnim.SetBool("walkHold", true);
+            playerAnim.SetBool("isWalking", true);
         }
         else
         {
-            playerAnim.SetBool("walkHold", false);
+            playerAnim.SetBool("isWalking", false);
         }
 
         // Sprint When Walking Only
@@ -147,11 +156,11 @@ public class PlayerController : MonoBehaviour
         if (sprintAction.WasPerformedThisFrame())
         {
             //Debug.Log("Sprint");  
-            playerAnim.SetBool("sprintHold", true); 
+            playerAnim.SetBool("isSprinting", true); 
             playerSpeed *= 2.5f;          
         } else if (sprintAction.WasReleasedThisFrame()){ 
             //Debug.Log("Unsprint");      
-            playerAnim.SetBool("sprintHold", false); 
+            playerAnim.SetBool("isSprinting", false); 
             playerSpeed /= 2.5f;    
         }
     }
@@ -161,10 +170,10 @@ public class PlayerController : MonoBehaviour
         if (kneelAction.WasPerformedThisFrame())
         {
             //Debug.Log("Crouch"); 
-            playerAnim.SetBool("kneelHold", true);            
+            playerAnim.SetBool("isKneeling", true);            
         } else if (kneelAction.WasReleasedThisFrame()){
             //Debug.Log("Uncrouch");      
-            playerAnim.SetBool("kneelHold", false);    
+            playerAnim.SetBool("isKneeling", false);    
         }
     }
 
@@ -174,6 +183,7 @@ public class PlayerController : MonoBehaviour
         {
             //Debug.Log("Shoot!");
             Instantiate(bullet, bulletSpawn.transform.position, bulletSpawn.transform.rotation);
+            shotsTaken ++;
         }
     }
 

@@ -25,6 +25,7 @@ public class ShootBullet : MonoBehaviour
             enemyController = other.gameObject.GetComponent<EnemyController>();
             float dmg = Random.Range(20f, 40f);
             enemyController.TakeDamage(dmg);
+            player.GetComponent<PlayerController>().shotsOnTarget ++;
         }
         if (!other.gameObject.CompareTag("Player"))
         {

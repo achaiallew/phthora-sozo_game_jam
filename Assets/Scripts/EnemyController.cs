@@ -22,8 +22,11 @@ public class EnemyController : MonoBehaviour
     [SerializeField] private GameObject bulletSpawn;
 
     private bool shootPlayer = false;
+    private bool dead = false;
 
     [SerializeField] private float enemyHealth = 100;
+
+    private GameManager gameManager;
 
 
     void Awake()
@@ -31,6 +34,8 @@ public class EnemyController : MonoBehaviour
         nav = GetComponent<NavMeshAgent>();
         enemyAnim = GetComponent<Animator>();
         player = GameObject.FindGameObjectWithTag("Player");
+        gameManager = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
+        dead = false;
     }
 
     public void SetPatrolRoute(List<Transform> route)
@@ -42,7 +47,7 @@ public class EnemyController : MonoBehaviour
     {
         if (patrolRoute == null || patrolRoute.Count == 0) return;
 
-        if (detectPlayer)
+        if (detectPlayer && !dead)
         {
             nav.ResetPath();
             float playerDist = Vector3.Distance(transform.position, player.transform.position);
@@ -94,14 +99,17 @@ public class EnemyController : MonoBehaviour
 
         if (enemyHealth < 0)
         {
-            Debug.Log("Die");
-            Destroy(gameObject);
+            dead = true;
+            enemyAnim.SetTrigger("isDead");
+            CancelInvoke("ShootPlayer");
+            gameManager.killCount ++;
         }
 
     }
 
     void ShootPlayer()
     {
+        enemyAnim.SetTrigger("shoot");
         Instantiate(bullet, bulletSpawn.transform.position, bulletSpawn.transform.rotation);
     }
 
