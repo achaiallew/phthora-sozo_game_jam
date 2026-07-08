@@ -10,15 +10,15 @@ public class PlayerController : MonoBehaviour
     public CharacterController controller;
 
     private InputAction moveAction;
-    private InputAction jumpAction;
+    public InputAction jumpAction;
     public InputAction shootAction;
-    private InputAction sprintAction;
+    public InputAction sprintAction;
     private InputAction kneelAction;
     private InputAction interactAction;
+    public InputAction reloadAction;
 
 
-    [SerializeField]
-    private Transform playerCamera;
+    [SerializeField] private Transform playerCamera;
 
     public float playerSpeed = 8.0f;
 
@@ -39,7 +39,7 @@ public class PlayerController : MonoBehaviour
 
     public float playerHealth = 100;
 
-    private AudioSource moveSound;
+    [SerializeField] private AudioSource moveSound;
     [SerializeField] private AudioSource runSound;
 
     private GameManager gameManager;
@@ -47,12 +47,14 @@ public class PlayerController : MonoBehaviour
     public int shotsTaken;
     public int shotsOnTarget;
 
+    private bool playerInRange = false;
+
 
     void Awake()
     {
         playerAnim = GetComponent<Animator>();
         controller = GetComponent<CharacterController>();
-        moveSound = GetComponent<AudioSource>();
+        
         gameManager = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
 
         moveAction = InputSystem.actions.FindAction("Move");
@@ -61,6 +63,7 @@ public class PlayerController : MonoBehaviour
         sprintAction = InputSystem.actions.FindAction("Sprint");
         kneelAction = InputSystem.actions.FindAction("Crouch");
         interactAction = InputSystem.actions.FindAction("Interact");
+        reloadAction.Enable();
     
     }
 
@@ -85,6 +88,8 @@ public class PlayerController : MonoBehaviour
             Jump();
             Kneel();
             Shoot();
+            Reload();
+            Interact();
             AudioController();
         }   
     }
@@ -139,6 +144,11 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    void JumpVert()
+    {
+        verticalVelocity = Mathf.Sqrt(jumpHeight * -1f * gravity);
+    }
+
     void Sprint()
     {
         if (sprintAction.WasPerformedThisFrame())
@@ -166,40 +176,76 @@ public class PlayerController : MonoBehaviour
     }
 
     void Shoot()
-{
-    if (shootAction.triggered)
     {
-        // Determine Direction (based on difference between player and laser spawn point)
-        Vector3 direction = playerCamera.forward;
-
-        // Ensure Valid Direction
-        if (direction.sqrMagnitude < 0.001f)
-            return;
-
-        // Create Shooting Direction Rotation
-        Quaternion bulletRotation = Quaternion.LookRotation(direction.normalized);
-
-        // Spawn Bullet
-        GameObject spawnedBullet = Instantiate(bullet, bulletSpawn.transform.position, bulletRotation);
-
-        // Access Shoot Bullet Script
-        ShootBullet shootBullet = spawnedBullet.GetComponentInChildren<ShootBullet>();
-        // If Script is Located
-        if (shootBullet != null)
+        if (shootAction.triggered)
         {
-            //Initalise Bullet in Correct Aiming Direction
-            shootBullet.Initialize(direction);
+            // Determine Direction (based on difference between player and laser spawn point)
+            Vector3 direction = playerCamera.forward;
+
+            // Ensure Valid Direction
+            if (direction.sqrMagnitude < 0.001f)
+                return;
+
+            // Create Shooting Direction Rotation
+            Quaternion bulletRotation = Quaternion.LookRotation(direction.normalized);
+
+            // Spawn Bullet
+            GameObject spawnedBullet = Instantiate(bullet, bulletSpawn.transform.position, bulletRotation);
+
+            // Access Shoot Bullet Script
+            ShootBullet shootBullet = spawnedBullet.GetComponentInChildren<ShootBullet>();
+            // If Script is Located
+            if (shootBullet != null)
+            {
+                //Initalise Bullet in Correct Aiming Direction
+                shootBullet.Initialize(direction);
+            }
+
+            // Count Total Shots
+            shotsTaken++;
+            gameManager.magBullets--;
         }
+    }   
 
-        // Count Total Shots
-        shotsTaken++;
-        gameManager.TrackPlayerBullets(); 
-    }
-}
-
-    void JumpVert()
+    void Reload()
     {
-        verticalVelocity = Mathf.Sqrt(jumpHeight * -1f * gravity);
+        if (reloadAction.triggered)
+        {
+            if (gameManager.magBullets != gameManager.magazine)
+            {
+                if (gameManager.excessBullets > 0)
+                {
+                    int bulletDiff = gameManager.magazine - gameManager.magBullets;
+                    gameManager.magBullets += bulletDiff ;
+                    gameManager.excessBullets  -= bulletDiff;
+                    //TODO: Reload Sound + Anim
+                    playerAnim.SetTrigger("reload");
+                }
+                
+                if (gameManager.excessBullets < 0)
+                {
+                    gameManager.excessBullets = 0;
+                }
+
+                if (shootAction.enabled == false)
+                {
+                    shootAction.Enable();
+                }
+            }
+            else
+            {
+                //TODO: Full Mag Sound
+            }
+        }
+    } 
+
+    void Interact()
+    {
+        if (interactAction.triggered && playerInRange)
+        {
+            gameManager.PickUpGun();
+        }
+        
     }
 
     public void TakeDamage(float dmg)
@@ -232,6 +278,25 @@ public class PlayerController : MonoBehaviour
         {
             moveSound.Pause();
         } 
+    
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        //TODO: PopUp Press E to Interact
+        
+        if (other.gameObject.CompareTag("Pistol"))
+        { 
+            playerInRange = true;
+        }
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.CompareTag("Pistol"))
+        { 
+            playerInRange = false;
+        }
     }
 
 }

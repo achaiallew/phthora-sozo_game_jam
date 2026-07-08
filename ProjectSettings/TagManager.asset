@@ -5,6 +5,10 @@ TagManager:
   serializedVersion: 3
   tags:
   - Enemy
+  - Laser
+  - Bullet
+  - Door
+  - Pistol
   layers:
   - Default
   - TransparentFX
@@ -12,7 +16,7 @@ TagManager:
   - WalkArea
   - Water
   - UI
-  - 
+  - Walls & Roof
   - 
   - 
   - 
