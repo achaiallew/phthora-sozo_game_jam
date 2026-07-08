@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour
 
     private InputAction moveAction;
     private InputAction jumpAction;
-    private InputAction shootAction;
+    public InputAction shootAction;
     private InputAction sprintAction;
     private InputAction kneelAction;
     private InputAction interactAction;
@@ -30,19 +30,14 @@ public class PlayerController : MonoBehaviour
 
     private Vector2 moveInput;
 
-    public float mouseSens;
-
-    public float jumpForce;
-    public float jumpTiming;
-    
-
+    //public float mouseSens;
 
     private Animator playerAnim;
 
     public GameObject bulletSpawn;
     public GameObject bullet;
 
-    [SerializeField] private float playerHealth = 100;
+    public float playerHealth = 100;
 
     private AudioSource moveSound;
     [SerializeField] private AudioSource runSound;
@@ -91,12 +86,6 @@ public class PlayerController : MonoBehaviour
             Kneel();
             Shoot();
             AudioController();
-
-            if (playerHealth < 0)
-            {
-                playerAnim.SetTrigger("isDead");
-                gameManager.GameOver();
-            }
         }   
     }
 
@@ -139,7 +128,6 @@ public class PlayerController : MonoBehaviour
 
             if (jumpAction.triggered)
             {   
-                //TODO: Fix Jump Anim
                 playerAnim.SetTrigger("jumpTrig");
                 Invoke("JumpVert", 0.2f);   
             }
@@ -178,14 +166,36 @@ public class PlayerController : MonoBehaviour
     }
 
     void Shoot()
+{
+    if (shootAction.triggered)
     {
-        if (shootAction.triggered)
+        // Determine Direction (based on difference between player and laser spawn point)
+        Vector3 direction = playerCamera.forward;
+
+        // Ensure Valid Direction
+        if (direction.sqrMagnitude < 0.001f)
+            return;
+
+        // Create Shooting Direction Rotation
+        Quaternion bulletRotation = Quaternion.LookRotation(direction.normalized);
+
+        // Spawn Bullet
+        GameObject spawnedBullet = Instantiate(bullet, bulletSpawn.transform.position, bulletRotation);
+
+        // Access Shoot Bullet Script
+        ShootBullet shootBullet = spawnedBullet.GetComponentInChildren<ShootBullet>();
+        // If Script is Located
+        if (shootBullet != null)
         {
-            //Debug.Log("Shoot!");
-            Instantiate(bullet, bulletSpawn.transform.position, bulletSpawn.transform.rotation);
-            shotsTaken ++;
+            //Initalise Bullet in Correct Aiming Direction
+            shootBullet.Initialize(direction);
         }
+
+        // Count Total Shots
+        shotsTaken++;
+        gameManager.TrackPlayerBullets(); 
     }
+}
 
     void JumpVert()
     {
@@ -195,7 +205,7 @@ public class PlayerController : MonoBehaviour
     public void TakeDamage(float dmg)
     {
         playerHealth -= dmg;
-        Debug.Log(playerHealth);
+       // Debug.Log(playerHealth);
     }
 
     void AudioController()
@@ -207,7 +217,7 @@ public class PlayerController : MonoBehaviour
         
         if (moveAction.IsInProgress() && sprintAction.WasPerformedThisFrame())
         {
-            Debug.Log("Sprint Sound!");
+            //Debug.Log("Sprint Sound!");
             runSound.Play();
             moveSound.Pause();
         }

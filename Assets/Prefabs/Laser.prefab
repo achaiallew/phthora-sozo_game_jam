@@ -9,13 +9,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6679312424609583341}
-  - component: {fileID: 4324340910387075975}
-  - component: {fileID: 479853828600600955}
-  - component: {fileID: 548639063648085659}
-  - component: {fileID: 5912871301075405147}
+  - component: {fileID: -5073031696562739494}
+  - component: {fileID: -2988563813190283890}
+  - component: {fileID: 2130384895009341372}
+  - component: {fileID: 1556470306947361284}
   m_Layer: 0
-  m_Name: Bullet
-  m_TagString: Bullet
+  m_Name: Laser
+  m_TagString: Laser
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -30,13 +30,13 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 6.80737, y: 1.68976, z: 8.18738}
-  m_LocalScale: {x: 0, y: 1, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3351389458315987299}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!54 &4324340910387075975
+--- !u!54 &-5073031696562739494
 Rigidbody:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -63,8 +63,8 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 116
   m_CollisionDetection: 0
---- !u!135 &479853828600600955
-SphereCollider:
+--- !u!136 &-2988563813190283890
+CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -81,10 +81,12 @@ SphereCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Radius: 0.03
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &548639063648085659
+  serializedVersion: 2
+  m_Radius: 0.039416313
+  m_Height: 1.0661936
+  m_Direction: 2
+  m_Center: {x: 0.0004925728, y: 0, z: 0.5059867}
+--- !u!114 &2130384895009341372
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -93,14 +95,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 7653624160004875867}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 271cdfd42bc060b40a52e0d4b319cefd, type: 3}
+  m_Script: {fileID: 11500000, guid: 419a7e30c1b4e634494953fdf8bfdb77, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ShootBullet
-  bulletSpeed: 10
-  maxDMG: 40
-  minDMG: 20
-  forwardCorrection: {x: -90, y: 0, z: 0}
---- !u!82 &5912871301075405147
+  m_EditorClassIdentifier: Assembly-CSharp::ShootLaser
+  laserSpeed: 5
+  laserLength: 100
+  maxDMG: 20
+  minDMG: 10
+--- !u!82 &1556470306947361284
 AudioSource:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -111,7 +113,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 8300000, guid: 5dbc74a65da58144aa0a20190bcd4909, type: 3}
+  m_Resource: {fileID: 8300000, guid: 50238a32333496c46bf4f0eef34ca63c, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 0.5
   m_Pitch: 1
@@ -219,19 +221,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 122648, guid: 11530f2b0a0cd2442949827ecbb622f2, type: 3}
       propertyPath: m_TagString
-      value: Bullet
-      objectReference: {fileID: 0}
-    - target: {fileID: 436056, guid: 11530f2b0a0cd2442949827ecbb622f2, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 0.04
-      objectReference: {fileID: 0}
-    - target: {fileID: 436056, guid: 11530f2b0a0cd2442949827ecbb622f2, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 0.04
-      objectReference: {fileID: 0}
-    - target: {fileID: 436056, guid: 11530f2b0a0cd2442949827ecbb622f2, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 0.04
+      value: Laser
       objectReference: {fileID: 0}
     - target: {fileID: 436056, guid: 11530f2b0a0cd2442949827ecbb622f2, type: 3}
       propertyPath: m_LocalPosition.x
@@ -273,28 +263,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 11475718, guid: 11530f2b0a0cd2442949827ecbb622f2, type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 11475718, guid: 11530f2b0a0cd2442949827ecbb622f2, type: 3}
-      propertyPath: m_lineColor.b
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 11475718, guid: 11530f2b0a0cd2442949827ecbb622f2, type: 3}
-      propertyPath: m_lineColor.g
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 11475718, guid: 11530f2b0a0cd2442949827ecbb622f2, type: 3}
-      propertyPath: m_lineColor.r
-      value: 0.84955835
-      objectReference: {fileID: 0}
     - target: {fileID: 72579481554731432, guid: 11530f2b0a0cd2442949827ecbb622f2, type: 3}
       propertyPath: laserSpeed
-      value: 10
+      value: 5
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 72579481554731432, guid: 11530f2b0a0cd2442949827ecbb622f2, type: 3}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []

@@ -1,7 +1,7 @@
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
+using Unity.VisualScripting;
+using System.Collections.Generic;
 
 public class EnemyController : MonoBehaviour
 {
@@ -18,8 +18,8 @@ public class EnemyController : MonoBehaviour
 
     public bool detectPlayer = false;
 
-    [SerializeField] private GameObject bullet;
-    [SerializeField] private GameObject bulletSpawn;
+    [SerializeField] private GameObject laser;
+    [SerializeField] private GameObject laserSpawn;
 
     private bool shootPlayer = false;
     private bool dead = false;
@@ -54,6 +54,7 @@ public class EnemyController : MonoBehaviour
 
             if (playerDist > attackRange)
             {
+                StopShooting();
                 nav.isStopped = false;
                 nav.destination = player.transform.position;
                 enemyAnim.SetBool("patrolWalk", true);
@@ -63,18 +64,9 @@ public class EnemyController : MonoBehaviour
                 nav.isStopped = true;
                 enemyAnim.SetBool("patrolWalk", false);
 
-                // Rotate to continuously face the player
-                Vector3 direction = player.transform.position - transform.position;
+                AimAtPlayer(false);
 
-                if (direction != Vector3.zero)
-                {
-                    Quaternion targetRotation = Quaternion.LookRotation(direction);
-                    transform.rotation = Quaternion.Slerp(
-                        transform.rotation,
-                        targetRotation,
-                        enemySpeed * Time.deltaTime
-                    );
-                }
+                
 
                 if (!shootPlayer)
                 {
@@ -88,6 +80,8 @@ public class EnemyController : MonoBehaviour
         } 
         else
         {
+            StopShooting();
+            
             if (!nav.pathPending && nav.remainingDistance < 0.5f)
             {
                 currentIndex = (currentIndex + 1) % patrolRoute.Count;
@@ -101,16 +95,68 @@ public class EnemyController : MonoBehaviour
         {
             dead = true;
             enemyAnim.SetTrigger("isDead");
-            CancelInvoke("ShootPlayer");
             gameManager.killCount ++;
         }
 
     }
 
+    void AimAtPlayer(bool snap)
+    {
+        Vector3 direction = player.transform.position - transform.position;
+
+        // Reset Vertical Direction
+        direction.y = 0f;
+
+        if (direction.sqrMagnitude <= 0.001f) return;
+        
+        Quaternion targetRotation = Quaternion.LookRotation(direction);
+        transform.rotation = snap
+            ? targetRotation
+            :Quaternion.Slerp(transform.rotation, targetRotation, enemySpeed * Time.deltaTime);
+
+    }
+
     void ShootPlayer()
     {
+        // Ensure All Variables Are Assigned
+        if (player == null || laser == null || laserSpawn == null) return;
+
+        AimAtPlayer(true);
+
+        // Assign Player Poistion as Aim Target
+        Vector3 target = player.transform.position;
+        // Set Y Value to Match Laser Spawn Point
+        target.y = laserSpawn.transform.position.y;
+        // Determine Direction (based on difference between player and laser spawn point)
+        Vector3 direction = target - laserSpawn.transform.position;
+
+        // Ensure Valid Direction
+        if (direction.sqrMagnitude < 0.001f) return;
+
+        // Create Shooting Direction Rotation
+        Quaternion laserRotation = Quaternion.LookRotation(direction.normalized);
+        // Spawn Laser
+        GameObject spawnLaser = Instantiate(laser, laserSpawn.transform.position, laserRotation);
+        
+        // Access Shoot Laser Script
+        ShootLaser shootLaser = spawnLaser.GetComponentInChildren<ShootLaser>();
+        // If Script is Located
+        if (shootLaser != null)
+        {
+            //Initalise Laser in Correct Aiming Direction
+            shootLaser.Initialize(direction);
+        }
+
         enemyAnim.SetTrigger("shoot");
-        Instantiate(bullet, bulletSpawn.transform.position, bulletSpawn.transform.rotation);
+ 
+    }
+
+    void StopShooting()
+    {
+        if (!shootPlayer) return;
+
+        CancelInvoke("ShootPlayer");
+        shootPlayer = false;
     }
 
     void OnTriggerEnter(Collider other)
@@ -126,6 +172,7 @@ public class EnemyController : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             detectPlayer = false;
+            StopShooting();
         }
     }
 
