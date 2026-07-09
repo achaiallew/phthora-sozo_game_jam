@@ -109,12 +109,12 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 2.7500012, y: 0.55976033, z: 3.4999988}
-  m_Center: {x: -1.6250011, y: -0.5217551, z: 1.7499998}
+  m_Size: {x: 9.4236145, y: 3.0871966, z: 3.4999988}
+  m_Center: {x: -4.961812, y: -0.3559681, z: 1.7499998}
 --- !u!95 &4996918785119557382
 Animator:
   serializedVersion: 7
@@ -149,7 +149,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 350c4a429ef7a5d4f95992a48c085e58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DoorController
-  player: {fileID: 0}
   doorDist: 3
 --- !u!1 &192030
 GameObject:

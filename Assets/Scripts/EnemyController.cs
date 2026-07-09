@@ -66,7 +66,6 @@ public class EnemyController : MonoBehaviour
 
                 AimAtPlayer(false);
 
-                
 
                 if (!shootPlayer)
                 {
@@ -96,6 +95,11 @@ public class EnemyController : MonoBehaviour
             dead = true;
             enemyAnim.SetTrigger("isDead");
             gameManager.killCount ++;
+        }
+
+        if (!gameManager.gameActive)
+        {
+            StopShooting();
         }
 
     }

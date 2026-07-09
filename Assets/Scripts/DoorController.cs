@@ -9,6 +9,11 @@ public class DoorController : MonoBehaviour
 
     public float doorDist = 3.0f;
 
+    private bool playerInRange = false;
+    private bool doorOpen = false;
+
+
+
     void Start()
     {
         animator = GetComponent<Animator>();
@@ -18,22 +23,38 @@ public class DoorController : MonoBehaviour
 
     void Update()
     {
-        //TODO: Animate Open Door, (Find Better System)
-        float xPos = (player.transform.position - gameObject.transform.position).Abs().x ;
-        float zPos= (player.transform.position- gameObject.transform.position).Abs().z;
        
-        if ((xPos < doorDist) || (zPos < doorDist))
+        if (playerInRange && !doorOpen)
         {
-            //Debug.Log("TriggerDoorAnim");
             animator.SetBool("openDoor", true);
+            doorOpen = true;
         }
 
-        if (animator.GetBool("openDoor"))
+        if (!playerInRange && doorOpen)
         {
-            if ((xPos > doorDist) || (zPos > doorDist))
-            {
-                animator.SetBool("openDoor", false);
-            }
+            StartCoroutine(nameof(CloseDoor), 3f);
         }    
+    }
+
+    void CloseDoor()
+    {
+        animator.SetBool("openDoor", false);
+        doorOpen = false;
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject == player)
+        {
+            playerInRange = true;
+        }
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject == player)
+        {
+            playerInRange = false;
+        }
     }
 }

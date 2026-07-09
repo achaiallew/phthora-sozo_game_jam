@@ -30,8 +30,6 @@ public class PlayerController : MonoBehaviour
 
     private Vector2 moveInput;
 
-    //public float mouseSens;
-
     private Animator playerAnim;
 
     public GameObject bulletSpawn;
@@ -91,6 +89,12 @@ public class PlayerController : MonoBehaviour
             Reload();
             Interact();
             AudioController();
+
+            if (shotsTaken != 0)
+            {
+                float accuracy = shotsOnTarget/shotsTaken;
+            }
+            
         }   
     }
 
@@ -283,10 +287,10 @@ public class PlayerController : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        //TODO: PopUp Press E to Interact
         
         if (other.gameObject.CompareTag("Pistol"))
         { 
+            gameManager.Tutorial("Hold E to Interact");
             playerInRange = true;
         }
     }

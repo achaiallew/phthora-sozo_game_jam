@@ -15,11 +15,10 @@ public class GameManager : MonoBehaviour
     private PlayerController playerController;
     private Animator playerAnim;
 
-    [SerializeField] private CinemachineInputAxisController camControl;
+    public CinemachineInputAxisController camControl;
     [SerializeField] private Camera firstPersonCam;
     [SerializeField] private Camera mainCam;
     [SerializeField] private CinemachineCamera thirdPersonCam;
-    private SpawnManager spawnManager;
 
     private float score = 0f;
 
@@ -46,8 +45,13 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject pistol;
     [SerializeField] private GameObject pistolOnTable;
 
-   
-    
+    [SerializeField] private TextMeshProUGUI tutorialText;
+    [SerializeField] private GameObject tutorialPannel;
+
+    private Coroutine openSceneCoroutine;
+
+    [SerializeField] private GameObject gameOverDisplay;
+
 
     void Awake()
     {
@@ -60,6 +64,8 @@ public class GameManager : MonoBehaviour
         mainCam.enabled = false;
         playerHUD.SetActive(false);
         pannel.SetActive(false);
+        tutorialPannel.SetActive(false);
+        gameOverDisplay.SetActive(false);
         pistol.SetActive(false);
 
         // Assign Voice Line Manager
@@ -69,7 +75,7 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         // Start Cutscene
-        StartCoroutine(OpenScene());
+        openSceneCoroutine = StartCoroutine(OpenScene());
     }
 
     IEnumerator OpenScene()
@@ -118,8 +124,14 @@ public class GameManager : MonoBehaviour
 
         // Play System Intructions Voice Line
         PlaySystemVoiceLine(voiceLineManager.retrieveWeapon);
-        yield return new WaitForSeconds(voiceLineManager.retrieveWeapon.length + 2);
-        
+        yield return new WaitForSeconds(voiceLineManager.retrieveWeapon.length);
+
+        // Indicate Pistol with Lighting
+        if (pistolOnTable.activeInHierarchy)
+        {
+            pistolOnTable.GetComponent<Light>().enabled = true;
+        }
+    
     }
 
 
@@ -146,7 +158,7 @@ public class GameManager : MonoBehaviour
     {
         // Activate Game
         gameActive = true;
-        // Disable Shoot and Reload Action
+        // Disable Player Actions
         playerController.shootAction.Disable();
         playerController.sprintAction.Disable();
         playerController.reloadAction.Disable();
@@ -159,53 +171,27 @@ public class GameManager : MonoBehaviour
         
     }
 
-    public void PickUpGun()
-    {
-        // PickUp Gun Animation
-        playerAnim.SetTrigger("pickupGun");
-
-        // Destory Gun on Table
-        Destroy(pistolOnTable);
-
-        // Enable All Player Actions
-        playerController.shootAction.Enable();
-        playerController.sprintAction.Enable();
-        playerController.reloadAction.Enable();
-        playerController.jumpAction.Enable();
-
-        // Play Player Pickup Gun Voice Line
-        PlayerVoiceLine(voiceLineManager.v4);
-
-        //Add Pistol to Hand
-        pistol.SetActive(true);
-
-        // Add Player HUD
-        playerHUD.SetActive(true);
-
-        // Ensure Score and Kill Count is Zero
-        score = 0f;
-        killCount = 0;
-    }
-
      void Update()
     {
         CalculateScore();  
         TrackPlayerHealth();  
-        TrackPlayerBullets();   
+        TrackPlayerBullets();
+    }
 
+    public void Tutorial(string text)
+    {
+        // Prompt User with Tutorial Pannel
+        tutorialPannel.SetActive(true);
+        tutorialText.text = text;       
     }
 
     void CalculateScore()
     {
         gameTime += Time.deltaTime;
 
-        if (playerController.shotsTaken > 0)
-        {
-            accuracy = playerController.shotsOnTarget/playerController.shotsTaken;
-            //gameTime and kill count
+                 //gameTime and kill count
 
             score = accuracy*100; 
-        }
     }
 
     void TrackPlayerHealth()
@@ -226,6 +212,44 @@ public class GameManager : MonoBehaviour
 
     }
 
+    public void PickUpGun()
+    {
+        //Stop Opening Scene Dialogue
+        if (openSceneCoroutine != null)
+        {
+            StopCoroutine(openSceneCoroutine);
+        }
+        
+
+        // PickUp Gun Animation
+        playerAnim.SetTrigger("pickupGun");
+
+        // Destory Gun on Table
+        Destroy(pistolOnTable);
+
+        // Enable All Player Actions
+        playerController.shootAction.Enable();
+        playerController.sprintAction.Enable();
+        playerController.reloadAction.Enable();
+        playerController.jumpAction.Enable();
+
+        // Play Player Pickup Gun Voice Line
+        PlayerVoiceLine(voiceLineManager.v4);
+
+        //Add Pistol to Hand
+        pistol.SetActive(true);
+
+        // Ensure Tutorial Disabled
+        tutorialPannel.SetActive(false);
+
+        // Add Player HUD
+        playerHUD.SetActive(true);
+
+        // Ensure Score and Kill Count is Zero
+        score = 0f;
+        killCount = 0;
+    }
+
     void TrackPlayerBullets()
     {
         magBulletText.text = magBullets.ToString();
@@ -237,6 +261,18 @@ public class GameManager : MonoBehaviour
         }
         
         //TODO: Pick Up Bullets
+    }
+
+    public void UpdateMouseSens(float mouseSens)
+    {
+        foreach (var c in camControl.Controllers)
+        {
+            if (c.Name == "Look X (Pan)")
+            {
+                c.Input.Gain = mouseSens;
+                break;
+            }
+        }
     }
 
     void PlaySystemVoiceLine(AudioClip clip)
@@ -253,7 +289,23 @@ public class GameManager : MonoBehaviour
     {
         gameActive = false;
         camControl.enabled = false;
-        Debug.Log("Game Over!");
+
+        // Disable All Other UI
+        playerHUD.SetActive(false);
+        tutorialPannel.SetActive(false);
+
+        // Enable Game Over
+        gameOverDisplay.SetActive(true);
+
+        //TODO: Score Text
+        // scoreText.text = "Score: " + score;
+
+        Debug.Log(gameTime);
         Debug.Log("Score: " + score);
+    }
+
+    public void Retry()
+    {
+        SceneManager.LoadScene(1);
     }
 }
