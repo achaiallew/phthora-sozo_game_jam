@@ -17,14 +17,13 @@ public class GameManager : MonoBehaviour
 
     public CinemachineInputAxisController camControl;
     [SerializeField] private Camera firstPersonCam;
-    [SerializeField] private Camera mainCam;
+    [SerializeField] private GameObject blackScreen;
     [SerializeField] private CinemachineCamera thirdPersonCam;
 
     private float score = 0f;
 
     public int killCount = 0;
     private float gameTime;
-    private float accuracy;
 
     [SerializeField] private Image healthBar;
     [SerializeField] private TextMeshProUGUI excessBulletText;
@@ -39,6 +38,9 @@ public class GameManager : MonoBehaviour
     private VoiceLineManager voiceLineManager;
     [SerializeField] private AudioSource systemSource;
     [SerializeField] private AudioSource playerSource;
+    public AudioClip emptyMagSound;
+    public AudioClip reloadSound;
+    public AudioClip fullMagSound;
 
     [SerializeField] private TypewriterText dialogue;
 
@@ -52,6 +54,11 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private GameObject gameOverDisplay;
 
+    [SerializeField] private GameObject endGamePannel;
+    [SerializeField] private GameObject winGamePannel;
+    [SerializeField] private TextMeshProUGUI scoreText;
+    [SerializeField] private GameObject scoreDisplay;
+
 
     void Awake()
     {
@@ -61,12 +68,18 @@ public class GameManager : MonoBehaviour
         camControl.enabled = false;
         thirdPersonCam.enabled = false;
         firstPersonCam.enabled = false;
-        mainCam.enabled = false;
+        blackScreen.SetActive(true);
         playerHUD.SetActive(false);
         pannel.SetActive(false);
         tutorialPannel.SetActive(false);
-        gameOverDisplay.SetActive(false);
+        endGamePannel.SetActive(false);
+        winGamePannel.SetActive(false);
+        scoreDisplay.SetActive(false);
+        
         pistol.SetActive(false);
+        gameOverDisplay.SetActive(false);
+
+        gameActive = false;
 
         // Assign Voice Line Manager
         voiceLineManager = GetComponent<VoiceLineManager>();
@@ -88,6 +101,7 @@ public class GameManager : MonoBehaviour
 
         // Enable FP Camera
         firstPersonCam.enabled = true;
+        blackScreen.SetActive(false);
 
         // Player Get Up Animation
         Invoke("GetUp", 4f);
@@ -164,7 +178,6 @@ public class GameManager : MonoBehaviour
         playerController.reloadAction.Disable();
         playerController.jumpAction.Disable();
 
-        mainCam.enabled = true;
         thirdPersonCam.enabled = true;
         firstPersonCam.enabled = false;
         camControl.enabled = true;
@@ -173,7 +186,7 @@ public class GameManager : MonoBehaviour
 
      void Update()
     {
-        CalculateScore();  
+
         TrackPlayerHealth();  
         TrackPlayerBullets();
     }
@@ -183,15 +196,6 @@ public class GameManager : MonoBehaviour
         // Prompt User with Tutorial Pannel
         tutorialPannel.SetActive(true);
         tutorialText.text = text;       
-    }
-
-    void CalculateScore()
-    {
-        gameTime += Time.deltaTime;
-
-                 //gameTime and kill count
-
-            score = accuracy*100; 
     }
 
     void TrackPlayerHealth()
@@ -208,7 +212,6 @@ public class GameManager : MonoBehaviour
             GameOver();
             // SceneManager.LoadScene(2); // Game Over Screen
         }
-
 
     }
 
@@ -245,6 +248,9 @@ public class GameManager : MonoBehaviour
         // Add Player HUD
         playerHUD.SetActive(true);
 
+        // Player Has Gun
+        playerController.haveGun = true;
+
         // Ensure Score and Kill Count is Zero
         score = 0f;
         killCount = 0;
@@ -254,13 +260,27 @@ public class GameManager : MonoBehaviour
     {
         magBulletText.text = magBullets.ToString();
         excessBulletText.text = excessBullets.ToString();
+
         if (magBullets == 0)
         {
-            //TODO: Empty Mag Sound or Reload Text
             playerController.shootAction.Disable();
         }
         
         //TODO: Pick Up Bullets
+    }
+
+    public void PickUpBullets()
+    {
+        int ammo = Random.Range(2, 4);
+        excessBullets += ammo;
+
+        // Disable Tutorial
+        tutorialPannel.SetActive(false);
+
+        // Collect Ammo Once
+        playerController.collectAmmo = true;
+
+
     }
 
     public void UpdateMouseSens(float mouseSens)
@@ -275,6 +295,20 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void EndGamePannel()
+    {
+        gameActive = false;
+        camControl.enabled = false;
+
+        // Disable All Other UI
+        playerHUD.SetActive(false);
+        tutorialPannel.SetActive(false);
+        winGamePannel.SetActive(false);
+
+        // Enable End Game Pannel
+        endGamePannel.SetActive(true);
+    }
+
     void PlaySystemVoiceLine(AudioClip clip)
     {
         systemSource.PlayOneShot(clip);
@@ -283,6 +317,28 @@ public class GameManager : MonoBehaviour
     public void PlayerVoiceLine(AudioClip clip)
     {
         playerSource.PlayOneShot(clip);
+    }
+
+    public void PlaySound(AudioClip clip)
+    {
+        systemSource.PlayOneShot(clip);
+    }
+
+    public void WinGame()
+    {
+        gameActive = false;
+        camControl.enabled = false;
+
+        // Disable All Other UI
+        playerHUD.SetActive(false);
+        tutorialPannel.SetActive(false);
+        endGamePannel.SetActive(false);
+
+        // Enable Win Screen
+        winGamePannel.SetActive(true);
+        scoreDisplay.SetActive(true);
+
+        scoreText.text = "Score: " + score;
     }
 
     public void GameOver()
@@ -296,11 +352,14 @@ public class GameManager : MonoBehaviour
 
         // Enable Game Over
         gameOverDisplay.SetActive(true);
+        scoreDisplay.SetActive(true);
 
-        //TODO: Score Text
-        // scoreText.text = "Score: " + score;
+        float endTime = Time.time;
+        Debug.Log("End Time: " + endTime);
+        score = playerController.accuracy*killCount*10000/endTime; 
+        Debug.Log("Score: " + score);
 
-        Debug.Log(gameTime);
+        scoreText.text = "Score: " + Mathf.Round(score);
         Debug.Log("Score: " + score);
     }
 

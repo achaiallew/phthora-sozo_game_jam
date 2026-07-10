@@ -54,7 +54,7 @@ public class MainMenu : MonoBehaviour
     public void AdjustSFX(float volume)
     {
         // Adjust Sound Effects Volume
-        audioMixer.SetFloat("MusicVolume", volume);
+        audioMixer.SetFloat("SFXVolume", volume);
     }
 
     public void MouseSens()
@@ -94,6 +94,6 @@ public class MainMenu : MonoBehaviour
 
     public void Quit()
     {
-        //TODO: Quit Game
+        Application.Quit();
     }
 }

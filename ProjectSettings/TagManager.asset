@@ -9,6 +9,7 @@ TagManager:
   - Bullet
   - Door
   - Pistol
+  - Ammo
   layers:
   - Default
   - TransparentFX

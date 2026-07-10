@@ -58,6 +58,7 @@ public class SettingsManager : MonoBehaviour
 
     public void Options()
     {
+        Debug.Log("Options");
         // Open Options Menu
         optionsMenu.SetActive(true);
 

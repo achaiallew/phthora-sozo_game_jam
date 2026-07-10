@@ -5,7 +5,7 @@ public class ShootLaser : MonoBehaviour
 {
     // Declare Laser Variables    
     [SerializeField] private float laserSpeed;
-    [SerializeField] private  float laserLength = 100f;
+    [SerializeField] private  float laserLength =50f;
     [SerializeField] private float maxDMG = 20f;
     [SerializeField] private float minDMG = 10f;
 
@@ -16,6 +16,7 @@ public class ShootLaser : MonoBehaviour
     private VolumetricLineBehavior laserLine;
 
     // Declare Laser Direction Variables
+    [SerializeField] private Vector3 rotationCorrection = Vector3.zero;
     private bool hasDirection = false;
     private Vector3 fireDirection;
 
@@ -36,6 +37,9 @@ public class ShootLaser : MonoBehaviour
         player = GameObject.FindGameObjectWithTag("Player");
         // Access Player Controller
         playerController = player.GetComponent<PlayerController>();
+
+        // Ensure RigidBody is Setup Correctly
+        ConfigureRigidbody();
     }
 
     void Start()
@@ -58,16 +62,20 @@ public class ShootLaser : MonoBehaviour
         // Ensure Valid Direction
         if (direction.sqrMagnitude < 0.001f) return; 
 
-        // Ensure RigidBody is Setup Correctly
-        ConfigureRigidbody();
 
         // Set Fire Direction 
         hasDirection = true;
         fireDirection = direction.normalized;
-        transform.rotation = Quaternion.LookRotation(fireDirection);
+
+        // Align Rotation Correctly
+        if (rotationCorrection != Vector3.zero)
+        {
+            transform.rotation = transform.rotation * Quaternion.Euler(rotationCorrection);
+        }
+
 
         // Apply Visual Direction 
-        ApplyVisualDirection(fireDirection);
+        ApplyVisualDirection();
 
         // Add Linear Velocity
         laserRB.linearVelocity = fireDirection * laserSpeed;
@@ -76,31 +84,23 @@ public class ShootLaser : MonoBehaviour
     void ConfigureRigidbody()
     {
         // Ensure Rigidbody is Assigned
-        if (laserRB == null)
-        {
-            laserRB = GetComponent<Rigidbody>();
-        }
         if (laserRB == null) return;
 
-        // Ensure Gravity is Zero
+        // Ensure Gravity and Kinematic Behaviour is Zero
         laserRB.useGravity = false;
+        laserRB.isKinematic = false;
         // Ensure Rotation is Freezed
         laserRB.constraints = RigidbodyConstraints.FreezeRotation;
     }
 
-    void ApplyVisualDirection(Vector3 direction)
+    void ApplyVisualDirection()
     {
         // Check Laser Line
         if (laserLine != null)
         {
             // Apply Laser Visual Length
             laserLine.StartPos = Vector3.zero;
-            laserLine.EndPos = direction * laserLength;
-        }
-        else
-        {
-            // Rotate Laser Line towards Player
-            transform.rotation = Quaternion.FromToRotation(Vector3.up, direction);
+            laserLine.EndPos = Vector3.forward * laserLength;
         }
         
     }

@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -39,13 +40,20 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] private AudioSource moveSound;
     [SerializeField] private AudioSource runSound;
+   
 
     private GameManager gameManager;
 
-    public int shotsTaken;
-    public int shotsOnTarget;
+    public float shotsTaken;
+    public float shotsOnTarget;
+    public float accuracy;
 
     private bool playerInRange = false;
+    private bool pickUpAmmo = false;
+    private bool enterConsole = false;
+
+    public bool collectAmmo = false;
+    public bool haveGun = false;
 
 
     void Awake()
@@ -92,7 +100,7 @@ public class PlayerController : MonoBehaviour
 
             if (shotsTaken != 0)
             {
-                float accuracy = shotsOnTarget/shotsTaken;
+                accuracy = shotsOnTarget/shotsTaken;
             }
             
         }   
@@ -209,45 +217,67 @@ public class PlayerController : MonoBehaviour
             shotsTaken++;
             gameManager.magBullets--;
         }
+
     }   
 
     void Reload()
     {
         if (reloadAction.triggered)
+{
+    if (gameManager.magBullets != gameManager.magazine)
+    {
+        if (gameManager.excessBullets > 0)
         {
-            if (gameManager.magBullets != gameManager.magazine)
-            {
-                if (gameManager.excessBullets > 0)
-                {
-                    int bulletDiff = gameManager.magazine - gameManager.magBullets;
-                    gameManager.magBullets += bulletDiff ;
-                    gameManager.excessBullets  -= bulletDiff;
-                    //TODO: Reload Sound + Anim
-                    playerAnim.SetTrigger("reload");
-                }
-                
-                if (gameManager.excessBullets < 0)
-                {
-                    gameManager.excessBullets = 0;
-                }
+            int bulletDiff = gameManager.magazine - gameManager.magBullets;
 
-                if (shootAction.enabled == false)
-                {
-                    shootAction.Enable();
-                }
+            if (gameManager.excessBullets < bulletDiff)
+            {
+                gameManager.magBullets += gameManager.excessBullets;
+                gameManager.excessBullets -= gameManager.excessBullets;
             }
             else
             {
-                //TODO: Full Mag Sound
+                gameManager.magBullets += bulletDiff;
+                gameManager.excessBullets -= bulletDiff;
             }
+
+            //Reload
+            gameManager.PlaySound(gameManager.reloadSound);
+            playerAnim.SetTrigger("reload");
         }
+
+        if (gameManager.excessBullets < 0)
+        {
+            gameManager.excessBullets = 0;
+        }
+        if (shootAction.enabled == false)
+        {
+            shootAction.Enable();
+        }
+    }
+    else
+    {
+        //Play Full Mag Sound
+        gameManager.PlaySound(gameManager.fullMagSound);
+    }
+}
     } 
 
     void Interact()
     {
-        if (interactAction.triggered && playerInRange)
+        if (interactAction.triggered && playerInRange && !haveGun)
         {
             gameManager.PickUpGun();
+        }
+
+        if (interactAction.triggered && pickUpAmmo && !collectAmmo)
+        {
+            gameManager.PickUpBullets();
+        }
+
+        if (interactAction.triggered && enterConsole)
+        {
+            gameManager.EndGamePannel();
         }
         
     }
@@ -293,6 +323,19 @@ public class PlayerController : MonoBehaviour
             gameManager.Tutorial("Hold E to Interact");
             playerInRange = true;
         }
+
+        if (other.gameObject.CompareTag("Finish"))
+        {
+            gameManager.Tutorial("Hold E to Interact");
+            enterConsole = true;
+        }
+
+        if (other.gameObject.CompareTag("Ammo"))
+        {
+            gameManager.Tutorial("Hold E to Interact");
+            pickUpAmmo = true;
+            collectAmmo = false;
+        }
     }
 
     void OnTriggerExit(Collider other)
@@ -300,6 +343,17 @@ public class PlayerController : MonoBehaviour
         if (other.gameObject.CompareTag("Pistol"))
         { 
             playerInRange = false;
+        }
+
+        if (other.gameObject.CompareTag("Ammo") && collectAmmo)
+        {
+            pickUpAmmo = false;
+            Destroy(other.gameObject);
+        }
+
+        if (other.gameObject.CompareTag("Finish"))
+        {
+            enterConsole = false;
         }
     }
 

@@ -28,6 +28,8 @@ public class EnemyController : MonoBehaviour
 
     private GameManager gameManager;
 
+    [SerializeField] private GameObject dropAmmo;
+
 
     void Awake()
     {
@@ -36,6 +38,7 @@ public class EnemyController : MonoBehaviour
         player = GameObject.FindGameObjectWithTag("Player");
         gameManager = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
         dead = false;
+        dropAmmo.SetActive(false);
     }
 
     public void SetPatrolRoute(List<Transform> route)
@@ -90,11 +93,16 @@ public class EnemyController : MonoBehaviour
             }
         }
 
-        if (enemyHealth < 0)
+        if (enemyHealth < 0 && !dead)
         {
             dead = true;
             enemyAnim.SetTrigger("isDead");
-            gameManager.killCount ++;
+            gameManager.killCount++;
+
+            if (dropAmmo != null)
+            {
+                dropAmmo.SetActive(true);
+            }
         }
 
         if (!gameManager.gameActive)
@@ -143,7 +151,7 @@ public class EnemyController : MonoBehaviour
         GameObject spawnLaser = Instantiate(laser, laserSpawn.transform.position, laserRotation);
         
         // Access Shoot Laser Script
-        ShootLaser shootLaser = spawnLaser.GetComponentInChildren<ShootLaser>();
+        ShootLaser shootLaser = spawnLaser.GetComponent<ShootLaser>();
         // If Script is Located
         if (shootLaser != null)
         {
